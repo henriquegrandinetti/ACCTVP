@@ -107,12 +107,22 @@ void TopView::drawAxis(Mat output, Point p){
     Vec3f uAxis = Vec3f(1,0,0) * 5000 + Pw;
     Vec3f vAxis = Vec3f(0,1,0) * 5000 + Pw;
     Vec3f wAxis = Vec3f(0,0,1) * 5000 + Pw;
-
+    
+    cout << w << endl;
+    cout << IPProjection(convertToCamCoord(Pw)) << endl;
+    cout << Pw << endl;
+    cout << IPProjection(convertToCamCoord(Vec3f(0,0,1) * 20 + Pw)) << endl;
+    cout << Vec3f(0,0,1) * 5000 + Pw << endl;
+    cout << convertToCamCoord(Vec3f(0,0,1) * 5000 + Pw) << endl;
+    cout << IPProjection(convertToCamCoord(Vec3f(0,0,1) * 5000 + Pw)) << endl;
+    
     uAxis = convertToCamCoord(uAxis);
     vAxis = convertToCamCoord(vAxis);
     wAxis = convertToCamCoord(wAxis);
     
     Point ref(output.cols/2, output.rows/2);
+    
+    cout << IPProjection(wAxis) << " OOOOOI" << endl;
     
     line(output, p + ref, IPProjection(uAxis), Scalar(0,0,255));
     line(output, p + ref, IPProjection(vAxis), Scalar(0,255,0));

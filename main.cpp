@@ -69,7 +69,7 @@ int main(int argc, char** argv)
     bool useCamera = true;
     bool playMode = true;
     bool stillImage = false;
-    bool stillVideo = true;
+    bool stillVideo = false;
     bool manual = false;
     
     // Parse arguments
