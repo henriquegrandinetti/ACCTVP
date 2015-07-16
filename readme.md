@@ -12,7 +12,7 @@ This software allows measurements and generates the top view projection of a pla
 
   `make`
 
-* Now, to run the program simply type `./planeProjection`
+* Now, to run the program simply type `./ACCTVP`
 
 ##License
 

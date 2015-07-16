@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(planeProjection)
+project(ACCTVP)
 
 find_package(OpenCV)
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 
 add_executable( 
-	planeProjection 
+	ACCTVP 
 	main.cpp
 	MSAC.cpp
 	MSAC.h
@@ -20,4 +20,4 @@ add_executable(
 	TopView.cpp
 )
 
-target_link_libraries(planeProjection ${OpenCV_LIBS})
+target_link_libraries(ACCTVP ${OpenCV_LIBS})
