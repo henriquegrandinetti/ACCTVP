@@ -14,6 +14,12 @@ This software allows measurements and generates the top view projection of a pla
 
 * Now, to run the program simply type `./ACCTVP`
 
+##Requirements
+
+This software requires the OpenCV library.
+
+It was successfully tested with Opencv 2.4.
+
 ##License
 
 This is a free to use for non-commercial purposes software.
