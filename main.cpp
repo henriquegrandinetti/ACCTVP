@@ -97,10 +97,8 @@ int main(int argc, char** argv)
     bool manual = false;
     
     //variable to print a trajectory
-    vector<Vec2f> trajectories;
-    readPoitsFile("trajectories.txt", &trajectories);
-    
-    cout << trajectories.size() << endl;
+    //vector<Vec2f> trajectories;
+    //readPoitsFile("trajectories.txt", &trajectories);
     
     // Parse arguments
     for(int i=1; i<argc; i++){
@@ -219,7 +217,7 @@ int main(int argc, char** argv)
     vector<Vec4f> vpVector;
     vector<Vec4f> stillVPS;
     
-    Mat top(1000,1000,CV_8UC3);
+    //Mat top(1000,1000,CV_8UC3);
     
     int frameNum=0;
     for(;;)
@@ -333,7 +331,7 @@ int main(int argc, char** argv)
             tv.setScaleFactor(Vec2f(444,325), Vec2f(505, 149), 5.0);
             //Vec2f point = tv.toGroundPlaneCoord(Vec2f(464, 268));
             
-            vector<Vec2f> b;
+            /*vector<Vec2f> b;
             b = tv.toTopViewCoordinates(trajectories);
             
             for (int k = 0; k < b.size(); k++) {
@@ -343,12 +341,12 @@ int main(int argc, char** argv)
             for (int k = 0; k < trajectories.size(); k++) {
                 Vec2f a = tv.toGroundPlaneCoord(trajectories[k]);
                 circle(top, Point(a[0] * 100 + 100, a[1] * 100), 2, Scalar(255,0,0));
-            }
+            }*/
             
-            imshow("Plane Coord", top);
+            //imshow("Plane Coord", top);
             imshow( "Top View", tv.topImage);
             
-            top = Scalar(0,0,0);
+            //top = Scalar(0,0,0);
         }
         
         imshow("Original", outputImg);
