@@ -110,20 +110,10 @@ void fitQuadRec(Point2f src[4], Point2f dst[4], Size size){
     else
         ratio = (max.y - min.y)/size.height;
     
-    //cout << dst[0] << endl;
-    //cout << dst[1] << endl;
-    //cout << dst[2] << endl;
-    //cout << dst[3] << endl;
-    
     dst[0] = Point2f((src[0].x - min.x)/ratio, (src[0].y - min.y)/ratio);
     dst[1] = Point2f((src[1].x - min.x)/ratio, (src[1].y - min.y)/ratio);
     dst[2] = Point2f((src[2].x - min.x)/ratio, (src[2].y - min.y)/ratio);
     dst[3] = Point2f((src[3].x - min.x)/ratio, (src[3].y - min.y)/ratio);
-    
-    //cout << dst[0] << endl;
-    //cout << dst[1] << endl;
-    //cout << dst[2] << endl;
-    //cout << dst[3] << endl;
 }
 
 Vec2f meanSegmentIntersections(vector<Vec4f> segments){

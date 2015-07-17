@@ -12,9 +12,10 @@
 #include <iostream>
 
 TopView::TopView(Mat img, Vec2f vp1, Vec2f vp2, mouseDataCrop *mouse){
-    image = Mat(img);
+    image = Mat(img).clone();
     Vec2f ref(image.cols/2, image.rows/2);
     mouseData = mouse;
+    transformationMat = Mat(3,3, CV_8UC1);
     
     //vanishing points in 2D
     Vec2f fu(vp1[0] - ref[0], vp1[1] - ref[1]);
@@ -38,9 +39,10 @@ TopView::TopView(Mat img, Vec2f vp1, Vec2f vp2, mouseDataCrop *mouse){
     M  = Mat(3, 3, CV_32F);
     Mi = Mat(3, 3, CV_32F);
     
-    sf = 1;
-    O = Vec3f(0,0,0);
+    sf = 1.0;
+    O = Vec3f(0.0,0.0,0.0);
     
+    //must follow this order
     ComputeUVW();
     ComputeM();
 }
@@ -61,12 +63,12 @@ void TopView::ComputeUVW(){
     w = cross_product(u, v);
     
     //swap w if defined down
-    /*if (w[1] > 0) {
+    if (w[1] > 0) {
      Vec3f temp(v);
      v = Vec3f(u);
      u = Vec3f(temp);
      w *= -1;
-     }*/
+     }
 }
 
 void TopView::ComputeM(){
@@ -104,29 +106,19 @@ void TopView::drawAxis(Mat output, Point p){
     
     Vec3f Pw = convertToWorldCoord(Vec3f(p.x, p.y, f));
     
-    Vec3f uAxis = Vec3f(1,0,0) * 5000 + Pw;
-    Vec3f vAxis = Vec3f(0,1,0) * 5000 + Pw;
-    Vec3f wAxis = Vec3f(0,0,1) * 5000 + Pw;
-    
-    cout << w << endl;
-    cout << IPProjection(convertToCamCoord(Pw)) << endl;
-    cout << Pw << endl;
-    cout << IPProjection(convertToCamCoord(Vec3f(0,0,1) * 20 + Pw)) << endl;
-    cout << Vec3f(0,0,1) * 5000 + Pw << endl;
-    cout << convertToCamCoord(Vec3f(0,0,1) * 5000 + Pw) << endl;
-    cout << IPProjection(convertToCamCoord(Vec3f(0,0,1) * 5000 + Pw)) << endl;
+    Vec3f uAxis = Vec3f(1,0,0) * 100 + Pw;
+    Vec3f vAxis = Vec3f(0,1,0) * 100 + Pw;
+    Vec3f wAxis = Vec3f(0,0,1) * 100 + Pw;
     
     uAxis = convertToCamCoord(uAxis);
     vAxis = convertToCamCoord(vAxis);
     wAxis = convertToCamCoord(wAxis);
     
     Point ref(output.cols/2, output.rows/2);
-    
-    cout << IPProjection(wAxis) << " OOOOOI" << endl;
-    
-    line(output, p + ref, IPProjection(uAxis), Scalar(0,0,255));
-    line(output, p + ref, IPProjection(vAxis), Scalar(0,255,0));
-    line(output, p + ref, IPProjection(wAxis), Scalar(255,0,0));
+        
+    arrowedLine(output, p + ref, IPProjection(uAxis), Scalar(0,0,255));
+    arrowedLine(output, p + ref, IPProjection(vAxis), Scalar(0,255,0));
+    arrowedLine(output, p + ref, IPProjection(wAxis), Scalar(255,0,0));
 }
 
 Vec3f TopView::convertToCamCoord(Vec3f A){
@@ -289,6 +281,8 @@ void TopView::generateTopImage(){
         transform_matrix = getPerspectiveTransform(source_points, dest_points);
     }
     
+    transformationMat = transform_matrix.clone();
+    
     warpPerspective(image, topImage, transform_matrix, Size(topImage.cols, (int)height));
 }
 
@@ -318,25 +312,35 @@ void TopView::cropTopView(){
 }
 
 void TopView::setOrigin(Vec2f p){
+    Vec2f ref(image.cols/2, image.rows/2);
     Vec3f P = convertToWorldCoord(Vec3f(0, 0, f));
-    O = vecPlaneInter(P, convertToWorldCoord(Vec3f(p[0], p[1], f)));
+    O = vecPlaneInter(P, convertToWorldCoord(Vec3f(p[0] - ref[0], p[1] - ref[1], f)));
 }
 
 void TopView::setScaleFactor(Vec2f a, Vec2f b, float dist){
+    Vec2f ref(image.cols/2, image.rows/2);
     Vec3f P = convertToWorldCoord(Vec3f(0, 0, f));
-    Vec3f A = vecPlaneInter(P, convertToWorldCoord(Vec3f(a[0], a[1], f)));
-    Vec3f B = vecPlaneInter(P, convertToWorldCoord(Vec3f(b[0], b[1], f)));
+    Vec3f A = vecPlaneInter(P, convertToWorldCoord(Vec3f(a[0] - ref[0], a[1] - ref[1], f)));
+    Vec3f B = vecPlaneInter(P, convertToWorldCoord(Vec3f(b[0] - ref[0], b[1] - ref[1], f)));
     float d = pointDistance(A, B);
     
     sf = d/dist;
 }
 
 Vec2f TopView::toGroundPlaneCoord(Vec2f a){
+    Vec2f ref(image.cols/2, image.rows/2);
     Vec3f P = convertToWorldCoord(Vec3f(0, 0, f));
-    Vec3f A = vecPlaneInter(P, convertToWorldCoord(Vec3f(a[0], a[1], f)));
+    Vec3f A = vecPlaneInter(P, convertToWorldCoord(Vec3f(a[0] - ref[0], a[1] - ref[1], f)));
     
     A -= O;
     A /= sf;
     
     return Vec2f(A[0], A[1]);
+}
+
+vector<Vec2f> TopView::toTopViewCoordinates(vector<Vec2f> a){
+    vector<Vec2f> result;
+    perspectiveTransform(a, result, transformationMat);
+    
+    return result;
 }

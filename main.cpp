@@ -14,6 +14,11 @@
 #include <stdio.h>
 #endif
 
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
+
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -27,8 +32,7 @@
 using namespace std;
 using namespace cv;
 
-void help()
-{
+void help(){
     cout
     << " ------------------------------------------------------------------------\n"
     << " | Usage: \n"
@@ -42,6 +46,26 @@ void help()
     << " | Keys:\n"
     << " |		Esc: Quit\n"
     << " -------------------------------------------------------------------------\n" << endl;
+}
+
+/* ----------------------------------------
+reads points from file.
+The points shou be in the following format: 
+[x1,y1], [x2, y2], ... 
+-------------------------------------------*/
+void readPoitsFile(string fileName, vector<Vec2f> *points){
+    ifstream trajFile(fileName.c_str());
+    string line;
+    while(getline(trajFile, line)) {
+        float x,y;
+        char open_br, close_br, comma;
+        stringstream line_stream(line);
+        while(line_stream >> open_br >> x >> comma >> y >> close_br >> comma) {
+            points->push_back(Point2f(x,y));
+        }
+        line_stream >> open_br >> x >> comma >> y >> close_br;
+        points->push_back(Point2f(x,y));
+    }
 }
 
 /** Main function*/
@@ -64,13 +88,19 @@ int main(int argc, char** argv)
     int procHeight = -1;
     int numVps = 2;
     int numFramesCalib = 40;
-    int houghThreshold = 120;
+    int houghThreshold = 140;
     
     bool useCamera = true;
     bool playMode = true;
     bool stillImage = false;
     bool stillVideo = false;
     bool manual = false;
+    
+    //variable to print a trajectory
+    vector<Vec2f> trajectories;
+    readPoitsFile("trajectories.txt", &trajectories);
+    
+    cout << trajectories.size() << endl;
     
     // Parse arguments
     for(int i=1; i<argc; i++){
@@ -189,6 +219,8 @@ int main(int argc, char** argv)
     vector<Vec4f> vpVector;
     vector<Vec4f> stillVPS;
     
+    Mat top(1000,1000,CV_8UC3);
+    
     int frameNum=0;
     for(;;)
     {
@@ -286,8 +318,8 @@ int main(int argc, char** argv)
         //top view calculation
         if (validVPS(vp)){
             
-            Fv = Vec2f(vp[0], vp[1]);
-            Fu = Vec2f(vp[2], vp[3]);
+            Fu = Vec2f(vp[0], vp[1]);
+            Fv = Vec2f(vp[2], vp[3]);
                         
             TopView tv(inputImg, Fu, Fv, &mdCrop);
             tv.drawAxis(outputImg, Point(0,0));
@@ -297,11 +329,26 @@ int main(int argc, char** argv)
             //allows to crop top view
             tv.cropTopView();
             
+            tv.setOrigin(Vec2f(444,325));
+            tv.setScaleFactor(Vec2f(444,325), Vec2f(505, 149), 5.0);
+            //Vec2f point = tv.toGroundPlaneCoord(Vec2f(464, 268));
+            
+            vector<Vec2f> b;
+            b = tv.toTopViewCoordinates(trajectories);
+            
+            for (int k = 0; k < b.size(); k++) {
+                circle(tv.topImage, Point(b[k][0], b[k][1]), 2, Scalar(255,0,0));
+            }
+            
+            for (int k = 0; k < trajectories.size(); k++) {
+                Vec2f a = tv.toGroundPlaneCoord(trajectories[k]);
+                circle(top, Point(a[0] * 100 + 100, a[1] * 100), 2, Scalar(255,0,0));
+            }
+            
+            imshow("Plane Coord", top);
             imshow( "Top View", tv.topImage);
             
-            tv.setOrigin(Vec2f(408,210));
-            tv.setScaleFactor(Vec2f(328, 284), Vec2f(572, 136), 13.0);
-            //Vec2f point = tv.toGroundPlaneCoord(Vec2f(40, 128));
+            top = Scalar(0,0,0);
         }
         
         imshow("Original", outputImg);
@@ -326,5 +373,4 @@ int main(int argc, char** argv)
         video.release();
     
     return 0;
-    
 }

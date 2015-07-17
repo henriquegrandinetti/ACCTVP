@@ -182,7 +182,7 @@ Vec4f automaticCalibration(MSAC &msac, int numVps, cv::Mat &imgGRAY, cv::Mat &ou
     // Draw line segments according to their cluster
     msac.drawCS(outputImg, lineSegmentsClusters, vps);
     
-    if (vps.size() == 2)
+    if (vps.size() >= 2)
         return Vec4f(vps[0].at<float>(0,0), vps[0].at<float>(1,0), vps[1].at<float>(0,0), vps[1].at<float>(1,0));
     else
         return Vec4f(-1,-1,-1,-1);

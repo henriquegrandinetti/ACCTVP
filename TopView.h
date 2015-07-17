@@ -33,6 +33,7 @@ private:
     Vec3f O;
     float sf; //scale factor
     mouseDataCrop *mouseData;
+    Mat transformationMat;
 public:
     Mat topImage;
     
@@ -52,6 +53,8 @@ public:
     Vec2f toGroundPlaneCoord(Vec2f a);
     void generateTopImage();
     void cropTopView();
+    vector<Vec2f> toTopViewCoordinates(vector<Vec2f> a);
+
 };
 
 #endif /* defined(__UoB_Project__TopView__) */
