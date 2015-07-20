@@ -27,3 +27,7 @@ This is a free to use for non-commercial purposes software.
 The automatic vanishing point estimation is based on the software created by Marcos Nieto and can be found in the original version [here](www.marcosnieto.net/vanishingPoint).
 
 The Least Squares Fitting method used by Nieto was created by Joachim Wuttke and can be found in its original version [here](www.messen-und-deuten.de/lmfit).
+
+##Contact
+
+Henrique Grandinetti - henriquegrandinetti@gmail.com
