@@ -30,7 +30,6 @@ The automatic vanishing point estimation is based on the software created by Mar
 
 The Least Squares Fitting method used by Nieto was created by Joachim Wuttke and can be found in its original version [here](www.messen-und-deuten.de/lmfit).
 
-<<<<<<< HEAD
 ##More Info
 
 More information available on readme.txt
@@ -38,8 +37,3 @@ More information available on readme.txt
 ##Contact
 
 Henrique Grandinetti - henriquegrandinetti@gmail.com
-=======
-##Contact
-
-Henrique Grandinetti - henriquegrandinetti@gmail.com
->>>>>>> c8ad6bfc5ab37402cc4e661dffb1a676e28cb880
