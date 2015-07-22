@@ -20,7 +20,8 @@ using namespace std;
 
 typedef struct mouseDataCrop{
     Point lastPoint;
-    vector<Vec2f> rec;
+    vector<Point2f> rec;
+    string windowName;
 }mouseDataCrop;
 
 class TopView{
@@ -28,9 +29,10 @@ private:
     Mat image;
     Mat M, Mi;
     float f;
-    Vec3f Fu, Fv;
+    Point3f Fu, Fv;
     Vec3f u, v, w;
-    Vec3f O;
+    Point3f O;
+    Point ref;
     float sf; //scale factor
     mouseDataCrop *mouseData;
     Mat transformationMat;
@@ -41,20 +43,20 @@ private:
     Vec2f verticalAxis();
     void ComputeUVW();
     void ComputeM();
-    Vec3f convertToCamCoord(Vec3f A);
-    Vec3f convertToWorldCoord(Vec3f A);
-    Point IPProjection(Vec3f P);
+    Point3f convertToCamCoord(Point3f A);
+    Point3f convertToWorldCoord(Point3f A);
+    Point IPProjection(Point3f P);
     
 public:
-    TopView(Mat img, Vec2f vp1, Vec2f vp2, mouseDataCrop *mouse);
+    TopView(Mat img, Point2f vp1, Point2f vp2, mouseDataCrop *mouse);
     void drawAxis(Mat output, Point p);
-    void setOrigin(Vec2f p);
-    void setScaleFactor(Vec2f a, Vec2f b, float dist);
-    Vec2f toGroundPlaneCoord(Vec2f a);
+    void setOrigin(Point p);
+    void setScaleFactor(Point a, Point b, float dist);
+    Point2f toGroundPlaneCoord(Point a);
     void generateTopImage();
     void cropTopView();
     vector<Vec2f> toTopViewCoordinates(vector<Vec2f> a);
 
 };
 
-#endif /* defined(__UoB_Project__TopView__) */
+#endif

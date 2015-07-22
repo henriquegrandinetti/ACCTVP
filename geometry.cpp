@@ -44,28 +44,29 @@ float cross(Vec2f A, Vec2f B, Vec2f C){
     return cross;
 }
 //Compute the distance from A to B
-double pointDistance(Vec2f A, Vec2f B){
-    float d1 = A[0] - B[0];
-    float d2 = A[1] - B[1];
-    return sqrt(d1 * d1 + d2 * d2);
+double pointDistance(Point2f A, Point2f B){
+    Vec2f d = A - B;
+    return length(d);
 }
 
-double pointDistance(Vec3f A, Vec3f B){
-    float d1 = A[0] - B[0];
-    float d2 = A[1] - B[1];
-    float d3 = A[2] - B[2];
-    return sqrt(d1 * d1 + d2 * d2 + d3 * d3);
+double pointDistance(Point3f A, Point3f B){
+    Vec3f d = A - B;
+    return length(d);
 }
 
 //Compute the distance from AB to C
 //if isSegment is true, AB is a segment, not a line.
-double linePointDist(Vec2f A, Vec2f B, Vec2f C, bool isSegment){
-    double dist = cross(A,B,C) / pointDistance(A,B);
+double linePointDist(Point2f A, Point2f B, Point2f C, bool isSegment){
+    Vec2f a(A.x, A.y);
+    Vec2f b(B.x, B.y);
+    Vec2f c(C.x, C.y);
+    
+    double dist = cross(a, b, c) / pointDistance(a, b);
     if(isSegment){
-        float dot1 = dot(A,B,C);
-        if(dot1 > 0)return pointDistance(B,C);
-        float dot2 = dot(B,A,C);
-        if(dot2 > 0)return pointDistance(A,C);
+        float dot1 = dot(a, b, c);
+        if(dot1 > 0)return pointDistance(b, c);
+        float dot2 = dot(b, a, c);
+        if(dot2 > 0)return pointDistance(a, c);
     }
     return abs(dist);
 }
@@ -74,12 +75,16 @@ float length(Vec3f A){
     return sqrt(A[0]*A[0] + A[1]*A[1] + A[2]*A[2]);
 }
 
-//intersection between vector and plane
-Vec3f vecPlaneInter(Vec3f p, Vec3f P){
+float length(Vec2f A){
+    return sqrt(A[0]*A[0] + A[1]*A[1]);
+}
+
+//intersection between vector and ground plane
+Point3f vecPlaneInter(Vec3f p, Point3f P){
     Vec3f normal(0,0,1);
     float D = - normal[0] * p[0] - normal[1] * p[1] - normal[2] * p[2];
     
-    Vec3f dir(P[0], P[1], P[2]);
+    Vec3f dir(P.x, P.y, P.z);
     normalize_vec(dir);
     
     double t = -(D)/(normal[0] * dir[0] + normal[1] * dir[1] + normal[2] * dir[2]);

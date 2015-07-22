@@ -20,12 +20,9 @@ typedef struct mouseDataVP{
     Mat image;
 } mouseDataVP;
 
-void callbackFunc(int event, int x, int y, int flags, void* userdata);
-
+Vec4f automaticCalibration(MSAC &msac, int numVps, cv::Mat &imgGRAY, cv::Mat &outputImg, int houghThreshold);
+bool validVPS(Vec4f vps);
+void mouseFunction(int event, int x, int y, int flags, void* userdata);
 Vec4f manualCalibration(mouseDataVP *data);
 
-Vec4f automaticCalibration(MSAC &msac, int numVps, cv::Mat &imgGRAY, cv::Mat &outputImg, int houghThreshold);
-
-bool validVPS(Vec4f vps);
-
-#endif /* defined(__UoB_Project__vanishingPoint__) */
+#endif

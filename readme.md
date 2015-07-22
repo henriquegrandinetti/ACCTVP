@@ -1,6 +1,8 @@
 #Automatic Camera Calibration for Top-View Projection
 
-This software allows measurements and generates the top view projection of a plane in a single view image. The plane is defined based on two vanishing points in the image, that can be both defined manually or automatically.
+This software automatically calibrates a camera based on two vanishing points from the image and generates a top-view projection of the plane defined by these same vanishing points. No camera parameter is needed.
+
+The code has also some built-in functions that allows to make measurements in the detected plane.
 
 ##Installation
 
@@ -27,3 +29,11 @@ This is a free to use for non-commercial purposes software.
 The automatic vanishing point estimation is based on the software created by Marcos Nieto and can be found in the original version [here](www.marcosnieto.net/vanishingPoint).
 
 The Least Squares Fitting method used by Nieto was created by Joachim Wuttke and can be found in its original version [here](www.messen-und-deuten.de/lmfit).
+
+##More Info
+
+More information available on readme.txt
+
+##Contact
+
+Henrique Grandinetti - henriquegrandinetti@gmail.com

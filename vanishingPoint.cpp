@@ -22,94 +22,7 @@
 
 using namespace std;
 
-void callbackFunc(int event, int x, int y, int flags, void* userdata){
-    mouseDataVP *data = (mouseDataVP *) userdata;
-    Mat temp = data->image.clone();
-    
-    if  (event == EVENT_LBUTTONDOWN ){
-        if (data->clicked) {
-            data->b = Point(x,y);
-            
-            if (!data->uDone)
-                line(data->image, data->a, data->b, Scalar(0,0,255));
-            else
-                line(data->image, data->a, data->b, Scalar(0,255,0));
-            
-            data->clicked = false;
-            imshow("Manual Calibration", data->image);
-            
-            if (!data->uDone)
-                data->fumanual.push_back(Vec4i(data->a.x, data->a.y, data->b.x, data->b.y));
-            else
-                data->fvmanual.push_back(Vec4i(data->a.x, data->a.y, data->b.x, data->b.y));
-        }
-        else{
-            data->a = Point(x,y);
-            data->clicked = true;
-        }
-    }
-    else if (event == EVENT_MOUSEMOVE ){
-        if (data->clicked) {
-            
-            if (!data->uDone)
-                line(temp, data->a, Point(x,y), Scalar(0,0,255));
-            else
-                line(temp, data->a, Point(x,y), Scalar(0,255,0));
-            
-            imshow("Manual Calibration", temp);
-            temp = data->image.clone();
-        }
-        else{
-            imshow("Manual Calibration", data->image);
-        }
-    }
-    
-    userdata = (void *) &data;
-}
-
-Vec4f manualCalibration(mouseDataVP *data){
-    
-    namedWindow("Manual Calibration");
-    setMouseCallback("Manual Calibration", callbackFunc, (void *)data);
-    imshow("Manual Calibration", data->image);
-    
-    cout << "Define at least two lines in the U direction and press SPACE when done." << endl;
-    
-    while (data->fumanual.size() < 2) {
-        waitKey(0);
-        
-        if(data->fumanual.size() > 1){
-            data->uDone = true;
-            break;
-        }
-        else{
-            cout << "ERROR: You must define at least " << 2 - data->fumanual.size() << " more line(s) in the U direction." << endl;
-        }
-    }
-    
-    cout << "Define at least two lines in the V direction and press SPACE when done." << endl;
-    
-    while (data->fvmanual.size() < 2) {
-        waitKey(0);
-        
-        if(data->fvmanual.size() > 1){
-            data->uDone = true;
-            break;
-        }
-        
-        else{
-            cout << "ERROR: You must define at least " << 2 - data->fvmanual.size() << " more line(s) in the V direction." << endl;
-        }
-    }
-    
-    destroyWindow("Manual Calibration");
-    
-    Vec2f uvp = meanSegmentIntersections(data->fumanual);
-    Vec2f vvp = meanSegmentIntersections(data->fvmanual);
-    
-    return Vec4f(uvp[0], uvp[1], vvp[0], vvp[1]);
-}
-
+//Originally written by Marcos Nieto
 /** This function contains the actions performed for each image*/
 Vec4f automaticCalibration(MSAC &msac, int numVps, cv::Mat &imgGRAY, cv::Mat &outputImg, int houghThreshold)
 {
@@ -190,4 +103,92 @@ Vec4f automaticCalibration(MSAC &msac, int numVps, cv::Mat &imgGRAY, cv::Mat &ou
 
 bool validVPS(Vec4f vps){
     return !(vps[0] == -1 && vps[1] == -1 && vps[2] == -1 && vps[3] == -1);
+}
+
+void mouseFunction(int event, int x, int y, int flags, void* userdata){
+    mouseDataVP *data = (mouseDataVP *) userdata;
+    Mat temp = data->image.clone();
+    
+    if  (event == EVENT_LBUTTONDOWN ){
+        if (data->clicked) {
+            data->b = Point(x,y);
+            
+            if (!data->uDone)
+                line(data->image, data->a, data->b, Scalar(0,0,255));
+            else
+                line(data->image, data->a, data->b, Scalar(0,255,0));
+            
+            data->clicked = false;
+            imshow("Manual Calibration", data->image);
+            
+            if (!data->uDone)
+                data->fumanual.push_back(Vec4i(data->a.x, data->a.y, data->b.x, data->b.y));
+            else
+                data->fvmanual.push_back(Vec4i(data->a.x, data->a.y, data->b.x, data->b.y));
+        }
+        else{
+            data->a = Point(x,y);
+            data->clicked = true;
+        }
+    }
+    else if (event == EVENT_MOUSEMOVE ){
+        if (data->clicked) {
+            
+            if (!data->uDone)
+                line(temp, data->a, Point(x,y), Scalar(0,0,255));
+            else
+                line(temp, data->a, Point(x,y), Scalar(0,255,0));
+            
+            imshow("Manual Calibration", temp);
+            temp = data->image.clone();
+        }
+        else{
+            imshow("Manual Calibration", data->image);
+        }
+    }
+    
+    userdata = (void *) &data;
+}
+
+Vec4f manualCalibration(mouseDataVP *data){
+    
+    namedWindow("Manual Calibration");
+    setMouseCallback("Manual Calibration", mouseFunction, (void *)data);
+    imshow("Manual Calibration", data->image);
+    
+    cout << "Define at least two lines in the U direction and press SPACE when done." << endl;
+    
+    while (data->fumanual.size() < 2) {
+        waitKey(0);
+        
+        if(data->fumanual.size() > 1){
+            data->uDone = true;
+            break;
+        }
+        else{
+            cout << "ERROR: You must define at least " << 2 - data->fumanual.size() << " more line(s) in the U direction." << endl;
+        }
+    }
+    
+    cout << "Define at least two lines in the V direction and press SPACE when done." << endl;
+    
+    while (data->fvmanual.size() < 2) {
+        waitKey(0);
+        
+        if(data->fvmanual.size() > 1){
+            data->uDone = true;
+            break;
+        }
+        
+        else{
+            cout << "ERROR: You must define at least " << 2 - data->fvmanual.size() << " more line(s) in the V direction." << endl;
+        }
+    }
+    
+    destroyWindow("Manual Calibration");
+    
+    Vec2f uvp = meanSegmentIntersections(data->fumanual);
+    Vec2f vvp = meanSegmentIntersections(data->fvmanual);
+    
+    return Vec4f(uvp[0], uvp[1], vvp[0], vvp[1]);
 }

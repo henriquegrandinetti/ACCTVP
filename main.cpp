@@ -38,33 +38,35 @@ void help(){
     << " | Usage: \n"
     << " |		-video		: Video file as input (Default: camera) \n"
     << " |		-image		: Image file as input (Default: camera) \n"
-    << " |		-still		: Camera doesn't change position, for more stable projection \n"
+    << " |		-still		: Camera doesn't change position, for a more stable projection \n"
     << " |		-manual		: Manual calibration of vanishing points \n"
     << " |		-play		: ON: the video runs until the end; OFF: frame by frame (key press event)\n"
     << " |		-resizedWidth	: Width size (Height calculated based on aspect ratio)\n"
     << " |		-houghThreshold	: Threshold for finding lines. Bigger less lines, smaller more lines. (Default: 120)\n"
     << " | Keys:\n"
     << " |		Esc: Quit\n"
-    << " -------------------------------------------------------------------------\n" << endl;
+    << " -------------------------------------------------------------------------\n"
+    << endl;
 }
 
 /* ----------------------------------------
 reads points from file.
-The points shou be in the following format: 
+The points should be in the following format:
 [x1,y1], [x2, y2], ... 
 -------------------------------------------*/
-void readPoitsFile(string fileName, vector<Vec2f> *points){
-    ifstream trajFile(fileName.c_str());
+void readPointsFile(string fileName, vector<Vec2f> *points){
+    ifstream file(fileName.c_str());
     string line;
-    while(getline(trajFile, line)) {
-        float x,y;
+    
+    while(getline(file, line)) {
+        float x, y;
         char open_br, close_br, comma;
         stringstream line_stream(line);
-        while(line_stream >> open_br >> x >> comma >> y >> close_br >> comma) {
-            points->push_back(Point2f(x,y));
+        while(line_stream >> open_br >> x >> comma >> y >> close_br >> comma){
+            points->push_back(Point2f(x, y));
         }
         line_stream >> open_br >> x >> comma >> y >> close_br;
-        points->push_back(Point2f(x,y));
+        points->push_back(Point2f(x, y));
     }
 }
 
@@ -73,11 +75,9 @@ int main(int argc, char** argv)
 {
     Vec2f Fu, Fv;
     
-    // Images
     cv::Mat inputImg, imgGRAY;
     cv::Mat outputImg;
     
-    // Other variables
     cv::VideoCapture video;
     cv::Size procSize;
     
@@ -88,7 +88,8 @@ int main(int argc, char** argv)
     int procHeight = -1;
     int numVps = 2;
     int numFramesCalib = 40;
-    int houghThreshold = 140;
+    int numFramesSmooth = 30;
+    int houghThreshold = 120;
     
     bool useCamera = true;
     bool playMode = true;
@@ -98,7 +99,7 @@ int main(int argc, char** argv)
     
     //variable to print a trajectory
     //vector<Vec2f> trajectories;
-    //readPoitsFile("trajectories.txt", &trajectories);
+    //readPointsFile("trajectories.txt", &trajectories);
     
     // Parse arguments
     for(int i=1; i<argc; i++){
@@ -206,10 +207,11 @@ int main(int argc, char** argv)
     msac.init(procSize);
     
     //create mouse structs
+    mouseDataCrop mdCrop;
+    mdCrop.windowName = "Top View"; //topview window name
     mouseDataVP mdVP;
     mdVP.uDone = false;
     mdVP.clicked = false;
-    mouseDataCrop mdCrop;
     
     Vec4f previousVP;
     Vec4f averageVP;
@@ -217,91 +219,97 @@ int main(int argc, char** argv)
     vector<Vec4f> vpVector;
     vector<Vec4f> stillVPS;
     
+    bool averageCompleted = false;
+    
     //Mat top(1000,1000,CV_8UC3);
     
     int frameNum=0;
-    for(;;)
-    {
+    for(;;){
+        
         if(!stillImage)
         {
             frameNum++;
             
-            // Get current image
+            //Get current image
             video >> inputImg;
         }
         
         if(inputImg.empty())
             break;
         
-        // Resize to processing size
+        //Resize to processing size
         cv::resize(inputImg, inputImg, procSize);
         
-        // Color Conversion
-        if(inputImg.channels() == 3)
-        {
+        //Color Conversion
+        if(inputImg.channels() == 3){
             cv::cvtColor(inputImg, imgGRAY, CV_BGR2GRAY);
             inputImg.copyTo(outputImg);
         }
-        else
-        {
+        else{
             inputImg.copyTo(imgGRAY);
             cv::cvtColor(inputImg, outputImg, CV_GRAY2BGR);
         }
         
         ////////////////////////////
-        // Process
+        // Calculate VPs
         ////////////////////////////
         
-        //get third frame for manual calibration
+        
+        //manual calibration
         if(manual && frameNum == 3){
             mdVP.image = inputImg.clone();
             vp = manualCalibration(&mdVP);
         }
         
-        //add frame to average vps
-        if(!manual && stillVideo && frameNum < numFramesCalib){
-            vp = automaticCalibration(msac, numVps, imgGRAY, outputImg, houghThreshold);
-            if (validVPS(vp))
-                stillVPS.push_back(vp);
-        }
-        
-        //average vps
-        if (!manual && stillVideo && frameNum == numFramesCalib) {
-            
-            for (int i = 0; i < stillVPS.size(); i++) {
-                vp += stillVPS[i];
+        //still video
+        else if(!manual && stillVideo){
+            //add vp to vector
+            if (frameNum < numFramesCalib && !averageCompleted) {
+                vp = automaticCalibration(msac, numVps, imgGRAY, outputImg, houghThreshold);
+                if (validVPS(vp))
+                    stillVPS.push_back(vp);
             }
-            vp /= (int)stillVPS.size();
             
-            if (!useCamera) {
-                video.open(videoFileName);
-                continue;
+            //average vp, re-start video and zero frame num
+            else if(frameNum == numFramesCalib && !averageCompleted){
+                for (int i = 0; i < stillVPS.size(); i++) {
+                    vp += stillVPS[i];
+                }
+                vp /= (int)stillVPS.size();
+                
+                if (!useCamera) {
+                    video.open(videoFileName);
+                    frameNum = 0;
+                    averageCompleted = true;
+                    continue;
+                }
             }
         }
         
         //automatic calibration
-        if (!manual && !stillVideo)
+        if (!manual && !stillVideo){
             vp = automaticCalibration(msac, numVps, imgGRAY, outputImg, houghThreshold);
-        
-        
-        if (!stillVideo && vpVector.size() < 30)
-            vpVector.push_back(vp);
-        
-        else if(!stillVideo){
-            vpVector.erase(vpVector.begin());
-            vpVector.push_back(vp);
-            averageVP = Vec4f(0,0,0,0);
-            for (int i = 0; i < 30; i++) {
-                averageVP += vpVector[i];
+            
+            //smooth vp position
+            if (vpVector.size() < 30)
+                vpVector.push_back(vp);
+            
+            else if(!stillVideo){
+                vpVector.erase(vpVector.begin());
+                vpVector.push_back(vp);
+                averageVP = Vec4f(0,0,0,0);
+                for (int i = 0; i < 30; i++) {
+                    averageVP += vpVector[i];
+                }
+                averageVP /= 30;
+                vp = averageVP;
             }
-            averageVP /= 30;
-            vp = averageVP;
         }
         
-        //avoid vp swap position
+        //avoid vps to swap position
         if (frameNum != 0 &&
-            pointDistance(Vec2f(previousVP[0], previousVP[1]), Vec2f(vp[0],vp[1])) > pointDistance(Vec2f(previousVP[0], previousVP[1]), Vec2f(vp[2],vp[3])) &&
-            pointDistance(Vec2f(previousVP[2], previousVP[3]), Vec2f(vp[2],vp[3])) > pointDistance(Vec2f(previousVP[2], previousVP[3]), Vec2f(vp[0],vp[1]))){
+            pointDistance(Point2f(previousVP[0], previousVP[1]), Point2f(vp[0],vp[1])) > pointDistance(Point2f(previousVP[0], previousVP[1]), Point2f(vp[2],vp[3])) &&
+            pointDistance(Point2f(previousVP[2], previousVP[3]), Point2f(vp[2],vp[3])) > pointDistance(Point2f(previousVP[2], previousVP[3]), Point2f(vp[0],vp[1]))){
             
             Vec4f temp(vp);
             vp[0] = vp[2];
@@ -313,11 +321,14 @@ int main(int argc, char** argv)
         
         previousVP = Vec4f(vp);
         
-        //top view calculation
+        ////////////////////////////
+        // Calculate Top-View
+        ////////////////////////////
+        
         if (validVPS(vp)){
             
-            Fu = Vec2f(vp[0], vp[1]);
-            Fv = Vec2f(vp[2], vp[3]);
+            Fu = Point2f(vp[0], vp[1]);
+            Fv = Point2f(vp[2], vp[3]);
                         
             TopView tv(inputImg, Fu, Fv, &mdCrop);
             tv.drawAxis(outputImg, Point(0,0));
@@ -327,26 +338,25 @@ int main(int argc, char** argv)
             //allows to crop top view
             tv.cropTopView();
             
-            tv.setOrigin(Vec2f(444,325));
-            tv.setScaleFactor(Vec2f(444,325), Vec2f(505, 149), 5.0);
-            //Vec2f point = tv.toGroundPlaneCoord(Vec2f(464, 268));
+            tv.setOrigin(Point(444,325));
+            tv.setScaleFactor(Point(444,325), Point(505, 149), 5.0);
+            //Point P = tv.toGroundPlaneCoord(Point(464, 268));
             
             /*vector<Vec2f> b;
             b = tv.toTopViewCoordinates(trajectories);
             
-            for (int k = 0; k < b.size(); k++) {
+            for (int k = 0; k < b.size(); k++)
                 circle(tv.topImage, Point(b[k][0], b[k][1]), 2, Scalar(255,0,0));
-            }
             
             for (int k = 0; k < trajectories.size(); k++) {
                 Vec2f a = tv.toGroundPlaneCoord(trajectories[k]);
                 circle(top, Point(a[0] * 100 + 100, a[1] * 100), 2, Scalar(255,0,0));
-            }*/
+            }
             
-            //imshow("Plane Coord", top);
-            imshow( "Top View", tv.topImage);
+            imshow("Plane Coord", top);
+            top = Scalar(0,0,0);*/
             
-            //top = Scalar(0,0,0);
+            imshow(mdCrop.windowName, tv.topImage);
         }
         
         imshow("Original", outputImg);
