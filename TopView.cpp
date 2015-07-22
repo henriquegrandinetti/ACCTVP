@@ -98,9 +98,9 @@ void TopView::drawAxis(Mat output, Point p){
     vAxis = convertToCamCoord(vAxis);
     wAxis = convertToCamCoord(wAxis);
             
-    arrowedLine(output, p + ref, IPProjection(uAxis), Scalar(0,0,255));
-    arrowedLine(output, p + ref, IPProjection(vAxis), Scalar(0,255,0));
-    arrowedLine(output, p + ref, IPProjection(wAxis), Scalar(255,0,0));
+    line(output, p + ref, IPProjection(uAxis), Scalar(0,0,255));
+    line(output, p + ref, IPProjection(vAxis), Scalar(0,255,0));
+    line(output, p + ref, IPProjection(wAxis), Scalar(255,0,0));
 }
 
 Point3f TopView::convertToCamCoord(Point3f A){
