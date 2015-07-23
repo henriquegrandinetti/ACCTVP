@@ -30,8 +30,8 @@ A demo can be seen at https://www.youtube.com/watch?v=wzTJg9jUTHg.
 
 ##Screenshots
 
-![alt tag](https://drive.google.com/file/d/0B3M3EjEHg1SYZ2V4TlBFcUhOM1U/view?usp=sharing)
-![alt tag](https://drive.google.com/file/d/0B3M3EjEHg1SYNUI5OWE1OVYyQUU/view?usp=sharing)
+![alt tag](https://github.com/henriquegrandinetti/ACCTVP/blob/master/scrennshots/screenshot1.png)
+![alt tag](https://github.com/henriquegrandinetti/ACCTVP/blob/master/scrennshots/screenshot2.png)
 
 ##License
 
