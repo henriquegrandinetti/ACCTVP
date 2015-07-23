@@ -98,8 +98,8 @@ int main(int argc, char** argv)
     bool manual = false;
     
     //variable to print a trajectory
-    vector<Point2f> trajectories;
-    readPointsFile("trajectories.txt", &trajectories);
+    //vector<Point2f> trajectories;
+    //readPointsFile("trajectories.txt", &trajectories);
     
     // Parse arguments
     for(int i=1; i<argc; i++){
@@ -340,13 +340,13 @@ int main(int argc, char** argv)
             tv.setScaleFactor(Point(444,325), Point(505, 149), 5.0);
             //Point P = tv.toGroundPlaneCoord(Point(464, 268));
             
-            vector<Point2f> b;
+            /*vector<Point2f> b;
             b = tv.toTopViewCoordinates(trajectories);
             
             for (int k = 0; k < b.size(); k++){
                 circle(tv.topImage, b[k], 2, Scalar(255,0,0));
                 circle(outputImg, trajectories[k], 2, Scalar(255,0,0));
-            }
+            }*/
             
             imshow(mdCrop.windowName, tv.topImage);
         }
