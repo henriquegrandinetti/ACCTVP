@@ -6,8 +6,8 @@
 //  Created by Henrique Grandinetti on 13/07/15.
 //  henriquegrandinetti@gmail.com
 
-#ifndef __UoB_Project__TopView__
-#define __UoB_Project__TopView__
+#ifndef __ACCTVP__TopView__
+#define __ACCTVP__TopView__
 
 #include <stdio.h>
 
@@ -55,7 +55,7 @@ public:
     Point2f toGroundPlaneCoord(Point a);
     void generateTopImage();
     void cropTopView();
-    vector<Vec2f> toTopViewCoordinates(vector<Vec2f> a);
+    vector<Point2f> toTopViewCoordinates(vector<Point2f> a);
 
 };
 

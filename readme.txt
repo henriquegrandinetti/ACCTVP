@@ -1,6 +1,6 @@
 Automatic Camera Calibration for Top-View Projection
 
-version 1.0 - July 2015
+Version 1.0 - July 2015
 
 ======================================================
 
@@ -16,12 +16,12 @@ Requirements:
 
 This software requires the OpenCV library.
 
-It was successfully tested with Opencv 2.4.
+It was successfully tested with OpenCV 2.4.
 
 Installation:
 -------------
 
-* The first thing is to make sure you have CMake installed in your computer, if not you can download it [here](http://www.cmake.org/download/). In linux "$ apt-get install cmake" will also work.
+* The first thing is to make sure you have CMake installed in your computer, if not you can download it [here](http://www.cmake.org/download/). In Linux "$ apt-get install cmake" will also work.
 
 * After installed cmake run the following commands:
 
@@ -66,7 +66,7 @@ $ ./ACCTVP -resizedWidth 600 -video footage1.mov -houghThreshold 150
 Plane Measurements with TopView Class:
 --------------------------------------
 
-* The TopView class is responsible not only to generate the top-view image but also to allow the plane measuraments that I have mentioned in the introduction. Here I will explain what each function does and how to use it.
+* The TopView class is responsible not only to generate the top-view image but also to allow the plane measurements that I have mentioned in the introduction. Here I will explain what each function does and how to use it.
 
 -- void drawAxis(Mat output, Point p);
 Draws the world axis on the image "output", centered at the point "p".
@@ -74,22 +74,27 @@ Draws the world axis on the image "output", centered at the point "p".
 -- void generateTopImage();
 Generates the top-image and stores it in the property "topImage".
 
--- vector<Vec2f> toTopViewCoordinates(vector<Vec2f> a);
-Transforms points (Vec2f) from the original image coordinates to the top-image coordinates.
+-- vector<Point2f> toTopViewCoordinates(vector<Point2f> a);
+Transforms points from the original image coordinates to the top-image coordinates.
 
 -- void cropTopView();
-Allows the top-view image to be croped to a smaller region of interest.
+Allows the top-view image to be cropped to a smaller region of interest.
 
 * Before mentioning the next functions, it is important to say that without any information from the real world all the measurements are provided under a scale factor, and the world space origin will be in the center of the camera sensor. It is, however, possible to change this with the following functions.
 
--- void setOrigin(Vec2f p);
+-- void setOrigin(Point p);
 Defines a new origin to the world space. The point p, in image coordinates will be this new point.
 
--- void setScaleFactor(Vec2f a, Vec2f b, float dist);
+-- void setScaleFactor(Point a, Point b, float dist);
 To have the measurements in a known scale it is needed to set the scale factor. This can be done with this function providing two points "a" and "b" in image coordinates, and the real distance "dist" between them.
 
--- Vec2f toGroundPlaneCoord(Vec2f a);
+-- Point2f toGroundPlaneCoord(Point a);
 Gives the ground plane coordinate of a point "a" in image coordinates.
+
+Demo:
+-----
+
+A demo can be seen at https://www.youtube.com/watch?v=wzTJg9jUTHg
 
 License:
 --------

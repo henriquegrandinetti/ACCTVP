@@ -276,8 +276,8 @@ Point2f TopView::toGroundPlaneCoord(Point a){
     return Point2f(A.x, A.y);
 }
 
-vector<Vec2f> TopView::toTopViewCoordinates(vector<Vec2f> a){
-    vector<Vec2f> result;
+vector<Point2f> TopView::toTopViewCoordinates(vector<Point2f> a){
+    vector<Point2f> result;
     perspectiveTransform(a, result, transformationMat);
     
     return result;

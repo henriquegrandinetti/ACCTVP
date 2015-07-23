@@ -6,8 +6,8 @@
 //  Created by Henrique Grandinetti on 13/07/15.
 //  henriquegrandinetti@gmail.com
 
-#ifndef __UoB_Project__vanishingPoint__
-#define __UoB_Project__vanishingPoint__
+#ifndef __ACCTVP__vanishingPoint__
+#define __ACCTVP__vanishingPoint__
 
 #include <stdio.h>
 #include "opencv2/core/core.hpp"

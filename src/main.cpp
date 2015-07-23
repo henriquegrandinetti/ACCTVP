@@ -54,7 +54,7 @@ reads points from file.
 The points should be in the following format:
 [x1,y1], [x2, y2], ... 
 -------------------------------------------*/
-void readPointsFile(string fileName, vector<Vec2f> *points){
+void readPointsFile(string fileName, vector<Point2f> *points){
     ifstream file(fileName.c_str());
     string line;
     
@@ -98,8 +98,8 @@ int main(int argc, char** argv)
     bool manual = false;
     
     //variable to print a trajectory
-    //vector<Vec2f> trajectories;
-    //readPointsFile("trajectories.txt", &trajectories);
+    vector<Point2f> trajectories;
+    readPointsFile("trajectories.txt", &trajectories);
     
     // Parse arguments
     for(int i=1; i<argc; i++){
@@ -221,8 +221,6 @@ int main(int argc, char** argv)
     
     bool averageCompleted = false;
     
-    //Mat top(1000,1000,CV_8UC3);
-    
     int frameNum=0;
     for(;;){
         
@@ -291,17 +289,17 @@ int main(int argc, char** argv)
             vp = automaticCalibration(msac, numVps, imgGRAY, outputImg, houghThreshold);
             
             //smooth vp position
-            if (vpVector.size() < 30)
+            if (vpVector.size() < numFramesSmooth)
                 vpVector.push_back(vp);
             
             else if(!stillVideo){
                 vpVector.erase(vpVector.begin());
                 vpVector.push_back(vp);
                 averageVP = Vec4f(0,0,0,0);
-                for (int i = 0; i < 30; i++) {
+                for (int i = 0; i < numFramesSmooth; i++) {
                     averageVP += vpVector[i];
                 }
-                averageVP /= 30;
+                averageVP /= numFramesSmooth;
                 vp = averageVP;
             }
         }
@@ -342,19 +340,13 @@ int main(int argc, char** argv)
             tv.setScaleFactor(Point(444,325), Point(505, 149), 5.0);
             //Point P = tv.toGroundPlaneCoord(Point(464, 268));
             
-            /*vector<Vec2f> b;
+            vector<Point2f> b;
             b = tv.toTopViewCoordinates(trajectories);
             
-            for (int k = 0; k < b.size(); k++)
-                circle(tv.topImage, Point(b[k][0], b[k][1]), 2, Scalar(255,0,0));
-            
-            for (int k = 0; k < trajectories.size(); k++) {
-                Vec2f a = tv.toGroundPlaneCoord(trajectories[k]);
-                circle(top, Point(a[0] * 100 + 100, a[1] * 100), 2, Scalar(255,0,0));
+            for (int k = 0; k < b.size(); k++){
+                circle(tv.topImage, b[k], 2, Scalar(255,0,0));
+                circle(outputImg, trajectories[k], 2, Scalar(255,0,0));
             }
-            
-            imshow("Plane Coord", top);
-            top = Scalar(0,0,0);*/
             
             imshow(mdCrop.windowName, tv.topImage);
         }

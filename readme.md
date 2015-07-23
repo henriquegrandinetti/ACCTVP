@@ -1,5 +1,7 @@
 #Automatic Camera Calibration for Top-View Projection
 
+v1.0
+
 This software automatically calibrates a camera based on two vanishing points from the image and generates a top-view projection of the plane defined by these same vanishing points. No camera parameter is needed.
 
 The code has also some built-in functions that allows to make measurements in the detected plane.
@@ -20,7 +22,11 @@ The code has also some built-in functions that allows to make measurements in th
 
 This software requires the OpenCV library.
 
-It was successfully tested with Opencv 2.4.
+It was successfully tested with OpenCV 2.4.
+
+##Demo
+
+A demo can be seen at https://www.youtube.com/watch?v=wzTJg9jUTHg.
 
 ##License
 

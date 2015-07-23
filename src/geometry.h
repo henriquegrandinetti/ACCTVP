@@ -6,8 +6,8 @@
 //  Created by Henrique Grandinetti on 13/07/15.
 //  henriquegrandinetti@gmail.com
 
-#ifndef __UoB_Project__geometry__
-#define __UoB_Project__geometry__
+#ifndef __ACCTVP__geometry__
+#define __ACCTVP__geometry__
 
 #include <stdio.h>
 
