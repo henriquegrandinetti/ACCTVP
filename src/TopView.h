@@ -25,29 +25,9 @@ typedef struct mouseDataCrop{
 }mouseDataCrop;
 
 class TopView{
-private:
-    Mat image;
-    Mat M, Mi;
-    float f;
-    Point3f Fu, Fv;
-    Vec3f u, v, w;
-    Point3f O;
-    Point ref;
-    float sf; //scale factor
-    mouseDataCrop *mouseData;
-    Mat transformationMat;
 public:
     Mat topImage;
     
-private:
-    Vec2f verticalAxis();
-    void ComputeUVW();
-    void ComputeM();
-    Point3f convertToCamCoord(Point3f A);
-    Point3f convertToWorldCoord(Point3f A);
-    Point IPProjection(Point3f P);
-    
-public:
     TopView(Mat img, Point2f vp1, Point2f vp2, mouseDataCrop *mouse);
     void drawAxis(Mat output, Point p);
     void setOrigin(Point p);
@@ -56,6 +36,26 @@ public:
     void generateTopImage();
     void cropTopView();
     vector<Point2f> toTopViewCoordinates(vector<Point2f> a);
+    
+private:
+    Mat image;
+    Mat M, Mi;
+    Point3f Fu, Fv;
+    Point3f O;
+    Point ref;
+    Vec3f u, v, w;
+    float f;
+    float sf; //scale factor
+    mouseDataCrop *mouseData;
+    Mat transformationMat;
+    
+    Vec2f verticalAxis();
+    void ComputeUVW();
+    void ComputeM();
+    Point3f convertToCamCoord(Point3f A);
+    Point3f convertToWorldCoord(Point3f A);
+    Point IPProjection(Point3f P);
+    
 
 };
 

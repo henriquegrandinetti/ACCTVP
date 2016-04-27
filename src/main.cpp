@@ -224,8 +224,7 @@ int main(int argc, char** argv)
     int frameNum=0;
     for(;;){
         
-        if(!stillImage)
-        {
+        if(!stillImage){
             frameNum++;
             
             //Get current image
@@ -336,8 +335,10 @@ int main(int argc, char** argv)
             //allows to crop top view
             tv.cropTopView();
             
-            tv.setOrigin(Point(444,325));
-            tv.setScaleFactor(Point(444,325), Point(505, 149), 5.0);
+            // Example of scale use
+            // tv.setOrigin(Point(444,325));
+            // tv.setScaleFactor(Point(444,325), Point(505, 149), 5.0);
+    
             //Point P = tv.toGroundPlaneCoord(Point(464, 268));
             
             /*vector<Point2f> b;
